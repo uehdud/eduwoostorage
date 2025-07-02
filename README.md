@@ -88,4 +88,4 @@ MIT License
 
 ---
 
-**By [Your Name/Team]**
+
