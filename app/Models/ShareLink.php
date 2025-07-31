@@ -16,7 +16,8 @@ class ShareLink extends Model
 
     public function isValidReferer($referer)
     {
-        if (!$this->allowed_referer) return true;
-        return parse_url($referer, PHP_URL_HOST) === parse_url($this->allowed_referer, PHP_URL_HOST);
+        $allowedHosts = ['eduwoo.id', 'www.eduwoo.id'];
+        $host = $referer ? parse_url($referer, PHP_URL_HOST) : null;
+        return $host && in_array($host, $allowedHosts);
     }
 }

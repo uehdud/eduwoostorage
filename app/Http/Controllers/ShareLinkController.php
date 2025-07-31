@@ -18,7 +18,18 @@ class ShareLinkController extends Controller
             'type' => 'required|in:file,folder',
             'id' => 'required|integer',
         ]);
+
+        // Get referer to set appropriate allowed referer
+        $referer = $request->headers->get('referer');
+        $refererHost = $referer ? parse_url($referer, PHP_URL_HOST) : null;
+
         $allowedReferer = 'http://127.0.0.1:8000/';
+        if ($refererHost === 'srv888802.hstgr.cloud') {
+            $allowedReferer = 'https://srv888802.hstgr.cloud/';
+        } elseif (in_array($refererHost, ['eduwoo.id', 'www.eduwoo.id'])) {
+            $allowedReferer = 'https://' . $refererHost . '/';
+        }
+
         $token = Str::random(32);
 
         $shareLink = ShareLink::create([
@@ -39,27 +50,48 @@ class ShareLinkController extends Controller
     {
         $shareLink = ShareLink::where('token', $token)->firstOrFail();
 
-        // Validasi referer: hanya izinkan dari domain tertentu
+        // Handle OPTIONS preflight request
+        if ($request->getMethod() === 'OPTIONS') {
+            $referer = $request->headers->get('referer');
+            $allowedHosts = [
+                'eduwoo.id',
+                'www.eduwoo.id',
+                'srv888802.hstgr.cloud',
+                '127.0.0.1',
+                'localhost',
+            ];
+            $refererHost = $referer ? parse_url($referer, PHP_URL_HOST) : null;
+
+            $allowedOrigin = '*';
+            if ($refererHost && in_array($refererHost, $allowedHosts)) {
+                if (in_array($refererHost, ['eduwoo.id', 'www.eduwoo.id'])) {
+                    $allowedOrigin = 'https://' . $refererHost;
+                } elseif ($refererHost === 'srv888802.hstgr.cloud') {
+                    $allowedOrigin = 'https://srv888802.hstgr.cloud';
+                }
+            }
+
+            return response('', 200, [
+                'Access-Control-Allow-Origin' => $allowedOrigin,
+                'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+                'Access-Control-Allow-Headers' => 'Range, Origin, Referer, Accept, Authorization, Content-Type',
+                'Access-Control-Max-Age' => '86400',
+                'Access-Control-Allow-Credentials' => 'true',
+            ]);
+        }
+
+        // Only allow referer from specified domains
         $referer = $request->headers->get('referer');
         $allowedHosts = [
+            'eduwoo.id',
+            'www.eduwoo.id',
+            'srv888802.hstgr.cloud',
             '127.0.0.1',
             'localhost',
-            'www.eduwoo.id',
-            'eduwoo.id',
         ];
         $refererHost = $referer ? parse_url($referer, PHP_URL_HOST) : null;
-
-        // Perbaikan: izinkan juga jika referer kosong (akses langsung dari browser/video tag di local)
-        if (app()->environment('local')) {
-            // Jika di local, izinkan referer kosong atau host local
-            if ($refererHost && !in_array($refererHost, $allowedHosts)) {
-                abort(403, 'Access denied: invalid referer');
-            }
-        } else {
-            // Production: referer wajib dan harus sesuai
-            if (!$refererHost || !in_array($refererHost, $allowedHosts)) {
-                abort(403, 'Access denied: invalid referer');
-            }
+        if (!$refererHost || !in_array($refererHost, $allowedHosts)) {
+            abort(403, 'Access denied: invalid referer');
         }
 
         // Optionally check expiry
@@ -80,19 +112,36 @@ class ShareLinkController extends Controller
             $start = 0;
             $end = $size - 1;
 
+            // Determine allowed origin based on referer
+            $allowedOrigin = '*';
+            $frameOptions = 'DENY';
+
+            if ($refererHost) {
+                if (in_array($refererHost, ['eduwoo.id', 'www.eduwoo.id'])) {
+                    $allowedOrigin = 'https://' . $refererHost;
+                    $frameOptions = 'ALLOWALL';
+                } elseif ($refererHost === 'srv888802.hstgr.cloud') {
+                    $allowedOrigin = 'https://srv888802.hstgr.cloud';
+                    $frameOptions = 'ALLOWALL';
+                } elseif (in_array($refererHost, ['127.0.0.1', 'localhost'])) {
+                    $allowedOrigin = '*';
+                    $frameOptions = 'ALLOWALL';
+                }
+            }
+
             $headers = [
                 'Content-Type' => $mime,
                 'Content-Disposition' => 'inline; filename="' . ($file->original_name ?? basename($path)) . '"',
                 'Accept-Ranges' => 'bytes',
                 'Cache-Control' => 'no-store, must-revalidate',
                 'X-Content-Type-Options' => 'nosniff',
-                'X-Frame-Options' => 'DENY',
+                'X-Frame-Options' => $frameOptions,
                 'X-Robots-Tag' => 'noindex, nofollow',
-                // Ganti origin sesuai domain produksi Anda
-                // 'Access-Control-Allow-Origin' => 'https://www.eduwoo.id',
+                'Access-Control-Allow-Origin' => $allowedOrigin,
                 'Access-Control-Allow-Methods' => 'GET, OPTIONS',
                 'Access-Control-Allow-Headers' => 'Range, Origin, Referer, Accept, Authorization, Content-Type',
                 'Access-Control-Expose-Headers' => 'Content-Range, Accept-Ranges, Content-Length, Content-Type',
+                'Access-Control-Allow-Credentials' => 'true',
             ];
 
             // Handle HTTP Range header for video seeking
