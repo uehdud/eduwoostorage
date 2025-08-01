@@ -5,6 +5,7 @@ namespace App\Livewire\Dashboard;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Folder;
 use App\Models\File;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,7 +17,8 @@ use Livewire\Attributes\Url;
 class Index extends Component
 {
     use WithFileUploads, WithPagination;
-    #[Url]
+    public $folders = [];
+    #[Url(as: 'page')]
     public ?int $page = 1;
     public $showFolderModal = false;
     public $folderName = '';
@@ -45,12 +47,12 @@ class Index extends Component
         $this->currentFolderId = request('folder_id');
         if ($this->currentFolderId) {
             $this->currentFolder = Folder::where('id', $this->currentFolderId)
-                ->where('user_id', auth()->id())
+                ->where('user_id', Auth::id())
                 ->first();
         }
 
         $this->filesWithoutFolder = File::whereNull('folder_id')
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
     }
@@ -64,12 +66,14 @@ class Index extends Component
                 ]);
                 Folder::create([
                     'name' => $this->folderName,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'parent_id' => $this->parentId ?? null,
                 ]);
             });
             $this->reset(['showFolderModal', 'folderName']);
+            $this->resetPage();
             session()->flash('success', 'Folder berhasil dibuat.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal membuat folder.');
             // report($e);
@@ -98,7 +102,7 @@ class Index extends Component
         try {
             DB::transaction(function () {
                 $folder = Folder::where('id', $this->renameFolderId)
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->first();
 
                 if ($folder) {
@@ -107,7 +111,9 @@ class Index extends Component
                 }
             });
             $this->reset(['renameFolderId', 'renameFolderName']);
+            $this->resetPage();
             session()->flash('success', 'Folder berhasil diubah.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal mengubah folder.');
             // report($e);
@@ -123,7 +129,7 @@ class Index extends Component
         try {
             DB::transaction(function () {
                 $file = File::where('id', $this->renameFileId)
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->first();
 
                 if ($file) {
@@ -132,7 +138,9 @@ class Index extends Component
                 }
             });
             $this->reset(['renameFileId', 'renameFileName']);
+            $this->resetPage();
             session()->flash('success', 'File berhasil diubah.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal mengubah file.');
             // report($e);
@@ -158,7 +166,7 @@ class Index extends Component
         try {
             DB::transaction(function () {
                 $file = File::where('id', $this->moveFileId)
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->first();
 
                 if ($file) {
@@ -169,7 +177,9 @@ class Index extends Component
 
             $this->reset(['moveFileId', 'targetFolderId']);
             $this->mount(); // Refresh data
+            $this->resetPage();
             session()->flash('success', 'File berhasil dipindahkan ke folder.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal memindahkan file.');
         }
@@ -184,7 +194,7 @@ class Index extends Component
         try {
             DB::transaction(function () {
                 $originalFile = File::where('id', $this->copyFileId)
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->first();
 
                 if ($originalFile) {
@@ -205,7 +215,7 @@ class Index extends Component
                             'size' => $originalFile->size,
                             'path' => $newPath,
                             'folder_id' => $this->targetFolderId,
-                            'user_id' => auth()->id(),
+                            'user_id' => Auth::id(),
                             'views' => 0,
                         ]);
                     }
@@ -214,7 +224,9 @@ class Index extends Component
 
             $this->reset(['copyFileId', 'targetFolderId']);
             $this->mount(); // Refresh data
+            $this->resetPage();
             session()->flash('success', 'File berhasil disalin ke folder.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal menyalin file.');
         }
@@ -223,7 +235,7 @@ class Index extends Component
     public function showFilePreview($fileId)
     {
         $file = File::where('id', $fileId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->first();
 
         if ($file) {
@@ -318,7 +330,7 @@ class Index extends Component
         $this->currentFolderId = $folderId;
         if ($folderId) {
             $this->currentFolder = Folder::where('id', $folderId)
-                ->where('user_id', auth()->id())
+                ->where('user_id', Auth::id())
                 ->first();
         } else {
             $this->currentFolder = null;
@@ -349,7 +361,7 @@ class Index extends Component
         try {
             DB::transaction(function () {
                 $folder = Folder::where('id', $this->moveFolderId)
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->first();
 
                 if ($folder) {
@@ -368,7 +380,9 @@ class Index extends Component
                 }
             });
             $this->reset(['moveFolderId', 'targetFolderId']);
+            $this->resetPage();
             session()->flash('success', 'Folder berhasil dipindahkan.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal memindahkan folder: ' . $e->getMessage());
         }
@@ -393,15 +407,17 @@ class Index extends Component
 
         try {
             DB::transaction(function () use ($id) {
-                $file = File::where('id', $id)->where('user_id', auth()->id())->first();
+                $file = File::where('id', $id)->where('user_id', Auth::id())->first();
                 if ($file) {
                     Storage::disk('public')->delete($file->path);
                     $file->delete();
                     $this->filesWithoutFolder = File::whereNull('folder_id')
-                        ->where('user_id', auth()->id())
+                        ->where('user_id', Auth::id())
                         ->latest()
                         ->get();
+                    $this->resetPage();
                     session()->flash('success', 'File berhasil dihapus.');
+                    $this->dispatch('refresh');
                 }
             });
         } catch (\Throwable $e) {
@@ -416,19 +432,21 @@ class Index extends Component
 
         try {
             DB::transaction(function () use ($id) {
-                $folder = Folder::where('id', $id)->where('user_id', auth()->id())->first();
+                $folder = Folder::where('id', $id)->where('user_id', Auth::id())->first();
                 if ($folder) {
                     foreach ($folder->files as $file) {
                         Storage::disk('public')->delete($file->path);
                         $file->delete();
                     }
                     $folder->delete();
-                    $this->folders = Folder::where('user_id', auth()->id())->get();
+                    $this->folders = Folder::where('user_id', Auth::id())->get();
                     $this->filesWithoutFolder = File::whereNull('folder_id')
-                        ->where('user_id', auth()->id())
+                        ->where('user_id', Auth::id())
                         ->latest()
                         ->get();
+                    $this->resetPage();
                     session()->flash('success', 'Folder berhasil dihapus.');
+                    $this->dispatch('refresh');
                 }
             });
         } catch (\Throwable $e) {
@@ -453,21 +471,23 @@ class Index extends Component
                         'size'          => $file->getSize(),
                         'path'          => $path,
                         'folder_id'     => $this->currentFolderId ?? null,
-                        'user_id'       => auth()->id(),
+                        'user_id'       => Auth::id(),
                         'views'         => 0,
                     ]);
                 }
             });
 
             // Refresh data table
-            $this->folders = Folder::where('user_id', auth()->id())->get();
+            $this->folders = Folder::where('user_id', Auth::id())->get();
             $this->filesWithoutFolder = File::whereNull('folder_id')
-                ->where('user_id', auth()->id())
+                ->where('user_id', Auth::id())
                 ->latest()
                 ->get();
 
             $this->reset(['files', 'showUploadModal', 'uploadProgress']);
+            $this->resetPage();
             session()->flash('success', 'File berhasil diupload.');
+            $this->dispatch('refresh');
         } catch (\Throwable $e) {
             session()->flash('error', 'Gagal upload file.');
             // report($e);
@@ -493,15 +513,17 @@ class Index extends Component
 
     public function deleteFile($id)
     {
-        $file = File::where('id', $id)->where('user_id', auth()->id())->first();
+        $file = File::where('id', $id)->where('user_id', Auth::id())->first();
         if ($file) {
             Storage::disk('public')->delete($file->path);
             $file->delete();
             $this->filesWithoutFolder = File::whereNull('folder_id')
-                ->where('user_id', auth()->id())
+                ->where('user_id', Auth::id())
                 ->latest()
                 ->get();
+            $this->resetPage();
             session()->flash('success', 'File berhasil dihapus.');
+            $this->dispatch('refresh');
         }
     }
 
@@ -511,12 +533,14 @@ class Index extends Component
         $this->showUploadModal = false;
         $this->reset(['files', 'uploadProgress']);
         // Refresh data table
-        $this->folders = Folder::where('user_id', auth()->id())->get();
+        $this->folders = Folder::where('user_id', Auth::id())->get();
         $this->filesWithoutFolder = File::whereNull('folder_id')
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
+        $this->resetPage();
         session()->flash('success', 'File berhasil diupload: ' . ($payload['filename'] ?? ''));
+        $this->dispatch('refresh');
     }
 
     #[On('close-upload-modal')]
@@ -533,7 +557,7 @@ class Index extends Component
 
     public function render()
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         // Get folders based on current directory
         $folders = Folder::where('user_id', $userId)

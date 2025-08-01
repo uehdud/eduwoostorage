@@ -135,7 +135,7 @@ class FileAccessController extends Controller
     {
         // Cari file berdasarkan path
         $file = File::where('path', 'uploads/' . $filename)->first();
-        
+
         if (!$file) {
             abort(404, 'File not found');
         }
@@ -177,7 +177,7 @@ class FileAccessController extends Controller
         // Determine allowed origin based on referer
         $allowedOrigin = '*';
         $frameOptions = 'SAMEORIGIN';
-        
+
         if ($refererHost) {
             if (in_array($refererHost, ['eduwoo.id', 'www.eduwoo.id'])) {
                 $allowedOrigin = 'https://' . $refererHost;
@@ -256,3 +256,4 @@ class FileAccessController extends Controller
             return response()->file($path, $headers);
         }
     }
+}

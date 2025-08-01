@@ -20,7 +20,7 @@
             <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
                 <!--begin::Content wrapper-->
                 <div class="d-flex flex-column flex-column-fluid">
-                   
+
                     <!--begin::Content-->
                     <div id="kt_app_content" class="app-content flex-column-fluid">
                         <!--begin::Card-->
@@ -81,59 +81,60 @@
                             <!--end::Card body-->
                         </div>
                         <!--end::Card--> <!--begin::Toolbar-->
-                    <div id="kt_app_toolbar"
-                        class="app-toolbar align-items-center justify-content-between py-2 py-lg-4">
-                                <!--begin::Toolbar wrapper-->
-                        <div class="d-flex flex-grow-1 flex-stack flex-wrap gap-2" id="kt_toolbar">
-                            <!--begin::Page title-->
-                            <div class="d-flex flex-column align-items-start me-3 gap-2">
-                                <!--begin::Title-->
-                                <h1 class="d-flex text-dark fw-bold m-0 fs-3">
-                                    File Manager 
-                                    @if($currentFolder)
-                                        - {{ $currentFolder->name }}
-                                        <button class="btn btn-sm btn-light ms-3" wire:click="goToParentFolder">
-                                            <i class="ki-duotone ki-arrow-left fs-2">
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                            </i>
-                                            Back
-                                        </button>
-                                    @else
-                                        - Root
-                                    @endif
-                                </h1>
-                                <!--end::Title-->
-                                <!--begin::Breadcrumb-->
-                                <ul class="breadcrumb breadcrumb-dot fw-semibold text-gray-600 fs-7">
-                                    <!--begin::Item-->
-                                    <li class="breadcrumb-item text-gray-600">
-                                        <a href="javascript:void(0)" wire:click="browseFolder(null)"
-                                            class="text-gray-600 text-hover-primary">Home</a>
-                                    </li>
-                                    <!--end::Item-->
-                                    @foreach($breadcrumb as $folder)
+                        <div id="kt_app_toolbar"
+                            class="app-toolbar align-items-center justify-content-between py-2 py-lg-4">
+                            <!--begin::Toolbar wrapper-->
+                            <div class="d-flex flex-grow-1 flex-stack flex-wrap gap-2" id="kt_toolbar">
+                                <!--begin::Page title-->
+                                <div class="d-flex flex-column align-items-start me-3 gap-2">
+                                    <!--begin::Title-->
+                                    <h1 class="d-flex text-dark fw-bold m-0 fs-3">
+                                        File Manager
+                                        @if ($currentFolder)
+                                            - {{ $currentFolder->name }}
+                                            <button class="btn btn-sm btn-light ms-3" wire:click="goToParentFolder">
+                                                <i class="ki-duotone ki-arrow-left fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                Back
+                                            </button>
+                                        @else
+                                            - Root
+                                        @endif
+                                    </h1>
+                                    <!--end::Title-->
+                                    <!--begin::Breadcrumb-->
+                                    <ul class="breadcrumb breadcrumb-dot fw-semibold text-gray-600 fs-7">
                                         <!--begin::Item-->
                                         <li class="breadcrumb-item text-gray-600">
-                                            <a href="javascript:void(0)" wire:click="browseFolder({{ $folder->id }})"
-                                                class="text-gray-600 text-hover-primary">{{ $folder->name }}</a>
+                                            <a href="javascript:void(0)" wire:click="browseFolder(null)"
+                                                class="text-gray-600 text-hover-primary">Home</a>
                                         </li>
                                         <!--end::Item-->
-                                    @endforeach
-                                    @if($currentFolder)
-                                        <!--begin::Item-->
-                                        <li class="breadcrumb-item text-gray-500">{{ $currentFolder->name }}</li>
-                                        <!--end::Item-->
-                                    @endif
-                                </ul>
-                                <!--end::Breadcrumb-->
-                            </div>
-                            <!--end::Page title-->
+                                        @foreach ($breadcrumb as $folder)
+                                            <!--begin::Item-->
+                                            <li class="breadcrumb-item text-gray-600">
+                                                <a href="javascript:void(0)"
+                                                    wire:click="browseFolder({{ $folder->id }})"
+                                                    class="text-gray-600 text-hover-primary">{{ $folder->name }}</a>
+                                            </li>
+                                            <!--end::Item-->
+                                        @endforeach
+                                        @if ($currentFolder)
+                                            <!--begin::Item-->
+                                            <li class="breadcrumb-item text-gray-500">{{ $currentFolder->name }}</li>
+                                            <!--end::Item-->
+                                        @endif
+                                    </ul>
+                                    <!--end::Breadcrumb-->
+                                </div>
+                                <!--end::Page title-->
 
+                            </div>
+                            <!--end::Toolbar wrapper-->
                         </div>
-                        <!--end::Toolbar wrapper-->
-                    </div>
-                    <!--end::Toolbar-->
+                        <!--end::Toolbar-->
                         <!--begin::Card-->
                         <div class="card card-flush">
                             <!--begin::Card header-->
@@ -183,7 +184,8 @@
                                                                         class="form-control"
                                                                         wire:model.defer="folderName" required>
                                                                     @error('folderName')
-                                                                        <span class="text-danger">{{ $message }}</span>
+                                                                        <span
+                                                                            class="text-danger">{{ $message }}</span>
                                                                     @enderror
                                                                 </div>
                                                             </div>
@@ -300,7 +302,7 @@
                                                                         <span class="path2"></span>
                                                                     </i>
                                                                 </span>
-                                                                <a href="javascript:void(0)" 
+                                                                <a href="javascript:void(0)"
                                                                     wire:click="browseFolder({{ $item->id }})"
                                                                     class="text-gray-800 text-hover-primary">{{ $item->name }}</a>
                                                             </div>
@@ -442,46 +444,54 @@
                                                                     @php
                                                                         $fileType = $this->getFileType($item);
                                                                     @endphp
-                                                                    
+
                                                                     @if ($fileType === 'image')
-                                                                        <i class="ki-duotone ki-picture fs-2x text-success me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-picture fs-2x text-success me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'video')
-                                                                        <i class="ki-duotone ki-video fs-2x text-primary me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-video fs-2x text-primary me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'audio')
-                                                                        <i class="ki-duotone ki-music fs-2x text-warning me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-music fs-2x text-warning me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'pdf')
-                                                                        <i class="ki-duotone ki-file-pdf fs-2x text-danger me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-file-pdf fs-2x text-danger me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'text')
-                                                                        <i class="ki-duotone ki-file-text fs-2x text-dark me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-file-text fs-2x text-dark me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'code')
-                                                                        <i class="ki-duotone ki-code fs-2x text-purple me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-code fs-2x text-purple me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                             <span class="path3"></span>
                                                                             <span class="path4"></span>
                                                                         </i>
                                                                     @elseif ($fileType === 'office')
-                                                                        <i class="ki-duotone ki-file-doc fs-2x text-info me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-file-doc fs-2x text-info me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
                                                                     @else
-                                                                        <i class="ki-duotone ki-file fs-2x text-muted me-4">
+                                                                        <i
+                                                                            class="ki-duotone ki-file fs-2x text-muted me-4">
                                                                             <span class="path1"></span>
                                                                             <span class="path2"></span>
                                                                         </i>
@@ -494,7 +504,8 @@
                                                                         {{ $item->name ?? $item->original_name }}
                                                                     </a>
                                                                     <div class="text-muted fs-7">
-                                                                        {{ strtoupper(pathinfo($item->original_name, PATHINFO_EXTENSION)) }} • {{ $item->views ?? 0 }} views
+                                                                        {{ strtoupper(pathinfo($item->original_name, PATHINFO_EXTENSION)) }}
+                                                                        • {{ $item->views ?? 0 }} views
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -594,7 +605,8 @@
                                                                                 <a href="#"
                                                                                     class="dropdown-item"
                                                                                     wire:click.prevent="showFilePreview({{ $item->id }})">
-                                                                                    <i class="ki-duotone ki-eye fs-5 me-2">
+                                                                                    <i
+                                                                                        class="ki-duotone ki-eye fs-5 me-2">
                                                                                         <span class="path1"></span>
                                                                                         <span class="path2"></span>
                                                                                         <span class="path3"></span>
@@ -1154,8 +1166,7 @@
                     <form wire:submit.prevent="moveFileToFolder">
                         <div class="modal-header">
                             <h5 class="modal-title">Move File to Folder</h5>
-                            <button type="button" class="btn-close"
-                                wire:click="$set('moveFileId', null)"></button>
+                            <button type="button" class="btn-close" wire:click="$set('moveFileId', null)"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
@@ -1190,8 +1201,7 @@
                     <form wire:submit.prevent="copyFileToFolder">
                         <div class="modal-header">
                             <h5 class="modal-title">Copy File to Folder</h5>
-                            <button type="button" class="btn-close"
-                                wire:click="$set('copyFileId', null)"></button>
+                            <button type="button" class="btn-close" wire:click="$set('copyFileId', null)"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
@@ -1220,7 +1230,8 @@
 
     {{-- Modal File Preview --}}
     @if ($showPreviewModal && $previewFile)
-        <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)" wire:click="closePreview">
+        <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)"
+            wire:click="closePreview">
             <div class="modal-dialog modal-xl" wire:click.stop>
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1244,16 +1255,15 @@
 
                                     @if ($fileType === 'image')
                                         <div class="text-center">
-                                            <img src="{{ route('file.serve', $previewFile->id) }}" 
-                                                 alt="{{ $previewFile->name }}"
-                                                 class="img-fluid rounded shadow"
-                                                 style="max-height: 60vh; object-fit: contain;">
+                                            <img src="{{ route('file.serve', $previewFile->id) }}"
+                                                alt="{{ $previewFile->name }}" class="img-fluid rounded shadow"
+                                                style="max-height: 60vh; object-fit: contain;">
                                         </div>
                                     @elseif ($fileType === 'video')
                                         <div class="text-center">
                                             <video controls class="w-100 rounded shadow" style="max-height: 60vh;">
-                                                <source src="{{ route('file.serve', $previewFile->id) }}" 
-                                                        type="{{ $previewFile->mime_type }}">
+                                                <source src="{{ route('file.serve', $previewFile->id) }}"
+                                                    type="{{ $previewFile->mime_type }}">
                                                 Your browser does not support the video tag.
                                             </video>
                                         </div>
@@ -1266,19 +1276,18 @@
                                                 </i>
                                             </div>
                                             <audio controls class="w-100">
-                                                <source src="{{ route('file.serve', $previewFile->id) }}" 
-                                                        type="{{ $previewFile->mime_type }}">
+                                                <source src="{{ route('file.serve', $previewFile->id) }}"
+                                                    type="{{ $previewFile->mime_type }}">
                                                 Your browser does not support the audio element.
                                             </audio>
                                         </div>
                                     @elseif ($fileType === 'pdf')
                                         <div class="text-center">
-                                            <iframe src="{{ route('file.serve', $previewFile->id) }}" 
-                                                    width="100%" 
-                                                    height="600px" 
-                                                    class="border-0 rounded shadow">
-                                                <p>Your browser does not support PDFs. 
-                                                   <a href="{{ route('file.serve', $previewFile->id) }}" target="_blank">Download the PDF</a>.
+                                            <iframe src="{{ route('file.serve', $previewFile->id) }}" width="100%"
+                                                height="600px" class="border-0 rounded shadow">
+                                                <p>Your browser does not support PDFs.
+                                                    <a href="{{ route('file.serve', $previewFile->id) }}"
+                                                        target="_blank">Download the PDF</a>.
                                                 </p>
                                             </iframe>
                                         </div>
@@ -1288,7 +1297,8 @@
                                         </div>
                                     @elseif ($fileType === 'code')
                                         <div class="bg-dark p-4 rounded" style="max-height: 60vh; overflow-y: auto;">
-                                            <code class="text-light d-block">{{ $this->getFileContent($previewFile) }}</code>
+                                            <code
+                                                class="text-light d-block">{{ $this->getFileContent($previewFile) }}</code>
                                         </div>
                                     @else
                                         <div class="text-center p-5">
@@ -1300,10 +1310,8 @@
                                             </div>
                                             <h5 class="text-muted">Preview not available</h5>
                                             <p class="text-muted">This file type cannot be previewed.</p>
-                                            <a href="{{ route('file.serve', $previewFile->id) }}" 
-                                               class="btn btn-primary" 
-                                               target="_blank" 
-                                               download>
+                                            <a href="{{ route('file.serve', $previewFile->id) }}"
+                                                class="btn btn-primary" target="_blank" download>
                                                 <i class="ki-duotone ki-cloud-download fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
@@ -1317,78 +1325,80 @@
                             <div class="col-md-4 bg-light-primary">
                                 <div class="p-4">
                                     <h6 class="fw-bold text-dark mb-4">File Information</h6>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">File Name:</small>
-                                        <div class="fw-bold">{{ $previewFile->name ?? $previewFile->original_name }}</div>
+                                        <div class="fw-bold">{{ $previewFile->name ?? $previewFile->original_name }}
+                                        </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">File Size:</small>
-                                        <div class="fw-bold">{{ number_format($previewFile->size / 1048576, 2) }} MB</div>
+                                        <div class="fw-bold">{{ number_format($previewFile->size / 1048576, 2) }} MB
+                                        </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">File Type:</small>
-                                        <div class="fw-bold">{{ strtoupper(pathinfo($previewFile->original_name, PATHINFO_EXTENSION)) }}</div>
+                                        <div class="fw-bold">
+                                            {{ strtoupper(pathinfo($previewFile->original_name, PATHINFO_EXTENSION)) }}
+                                        </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">MIME Type:</small>
                                         <div class="fw-bold">{{ $previewFile->mime_type }}</div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">Views:</small>
                                         <div class="fw-bold">{{ $previewFile->views ?? 0 }}</div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">Uploaded:</small>
-                                        <div class="fw-bold">{{ $previewFile->created_at->format('M d, Y H:i') }}</div>
+                                        <div class="fw-bold">{{ $previewFile->created_at->format('M d, Y H:i') }}
+                                        </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <small class="text-muted">Last Modified:</small>
-                                        <div class="fw-bold">{{ $previewFile->updated_at->format('M d, Y H:i') }}</div>
+                                        <div class="fw-bold">{{ $previewFile->updated_at->format('M d, Y H:i') }}
+                                        </div>
                                     </div>
 
                                     <hr>
 
                                     <div class="d-grid gap-2">
-                                        <a href="{{ route('file.serve', $previewFile->id) }}" 
-                                           class="btn btn-primary btn-sm" 
-                                           target="_blank">
+                                        <a href="{{ route('file.serve', $previewFile->id) }}"
+                                            class="btn btn-primary btn-sm" target="_blank">
                                             <i class="ki-duotone ki-external-link fs-4 me-1">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
                                             </i>
                                             Open in New Tab
                                         </a>
-                                        
-                                        <a href="{{ route('file.serve', $previewFile->id) }}" 
-                                           class="btn btn-success btn-sm" 
-                                           download>
+
+                                        <a href="{{ route('file.serve', $previewFile->id) }}"
+                                            class="btn btn-success btn-sm" download>
                                             <i class="ki-duotone ki-cloud-download fs-4 me-1">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
                                             </i>
                                             Download
                                         </a>
-                                        
-                                        <button type="button" 
-                                                class="btn btn-warning btn-sm"
-                                                wire:click="showRenameModalFile({{ $previewFile->id }}, '{{ addslashes($previewFile->name) }}')">
+
+                                        <button type="button" class="btn btn-warning btn-sm"
+                                            wire:click="showRenameModalFile({{ $previewFile->id }}, '{{ addslashes($previewFile->name) }}')">
                                             <i class="ki-duotone ki-pencil fs-4 me-1">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
                                             </i>
                                             Rename
                                         </button>
-                                        
-                                        <button type="button" 
-                                                class="btn btn-danger btn-sm"
-                                                onclick="confirmDeleteFile({{ $previewFile->id }})">
+
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="confirmDeleteFile({{ $previewFile->id }})">
                                             <i class="ki-duotone ki-trash fs-4 me-1">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
@@ -1411,12 +1421,13 @@
         </div>
     @endif
 
-    @push('scripts'>
+    @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            // Listener Livewire event 'refresh' untuk reload halaman
+            window.Livewire.on('refresh', () => window.location.reload());
             // Pastikan Livewire v3: gunakan window.Livewire, bukan Livewire.emit
             window.confirmDeleteFolder = function(folderId) {
-
                 Swal.fire({
                     title: 'Yakin ingin menghapus folder ini?',
                     icon: 'warning',
@@ -1426,8 +1437,7 @@
                     confirmButtonColor: '#d33'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Gunakan dispatch jika Livewire v3, emit jika v2
-                        Livewire.dispatch('deleteFolderSwal', {
+                        window.Livewire.dispatch('deleteFolderSwal', {
                             id: folderId
                         });
                     }
@@ -1444,7 +1454,7 @@
                     confirmButtonColor: '#d33'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Livewire.dispatch('deleteFileSwal', {
+                        window.Livewire.dispatch('deleteFileSwal', {
                             id: fileId
                         });
                     }
@@ -1463,56 +1473,123 @@
             });
 
             // Share link generation
-            document.querySelectorAll('[data-kt-filemanger-table="copy_link"] button').forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    var tr = btn.closest('tr');
-                    var isFolder = tr && tr.querySelector('i.ki-folder');
-                    var isFile = tr && tr.querySelector('i.ki-file');
-                    var id = null,
-                        type = null;
-                    if (isFolder) {
-                        id = tr.querySelector('input[type="checkbox"]').value;
-                        type = 'folder';
-                    } else if (isFile) {
-                        id = tr.querySelector('input[type="checkbox"]').value.replace('file-', '');
-                        type = 'file';
-                    }
-                    if (!id || !type) return;
+            function bindCopyLinkButtons() {
+                document.querySelectorAll('[data-kt-filemanger-table="copy_link"] button').forEach(function(btn) {
+                    btn.removeEventListener('click', btn._copyLinkHandler);
+                    btn._copyLinkHandler = function(e) {
+                        e.preventDefault();
+                        var tr = btn.closest('tr');
+                        var checkbox = tr.querySelector('input[type="checkbox"]');
+                        if (!checkbox) return;
 
-                    var loader = tr.querySelector('[data-kt-filemanger-table="copy_link_generator"]');
-                    var result = tr.querySelector('[data-kt-filemanger-table="copy_link_result"]');
-                    loader.classList.remove('d-none');
-                    result.classList.add('d-none');
+                        var checkboxValue = checkbox.value;
+                        var id = null,
+                            type = null;
 
-                    fetch('{{ route('share.generate') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                type: type,
-                                id: id
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(function(data) {
-                            loader.classList.add('d-none');
-                            result.classList.remove('d-none');
-                            result.querySelector('input').value = data.url;
-                        })
-                        .catch(function() {
-                            loader.classList.add('d-none');
-                            result.classList.remove('d-none');
-                            result.querySelector('input').value = 'Failed to generate link';
+                        // Check if it's a file (value starts with 'file-')
+                        if (checkboxValue.startsWith('file-')) {
+                            id = checkboxValue.replace('file-', '');
+                            type = 'file';
+                        } else {
+                            // It's a folder (numeric value)
+                            id = checkboxValue;
+                            type = 'folder';
+                        }
+
+                        if (!id || !type) {
+                            console.error('Could not determine file/folder ID and type');
+                            return;
+                        }
+
+                        console.log('Generating share link for:', {
+                            type: type,
+                            id: id
                         });
+
+
+                        // Find the menu dropdown associated with this button
+                        var menu = btn.closest('[data-kt-filemanger-table="copy_link"]').querySelector('.menu');
+                        if (!menu) {
+                            console.error('Could not find menu dropdown');
+                            return;
+                        }
+
+                        var loader = menu.querySelector('[data-kt-filemanger-table="copy_link_generator"]');
+                        var result = menu.querySelector('[data-kt-filemanger-table="copy_link_result"]');
+                        var input = menu.querySelector('input');
+
+                        if (!loader || !result || !input) {
+                            console.error('Could not find loader, result, or input elements');
+                            return;
+                        }
+
+                        loader.classList.remove('d-none');
+                        result.classList.add('d-none');
+
+                        fetch('{{ route('share.generate') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    type: type,
+                                    id: parseInt(id)
+                                })
+                            })
+                            .then(function(response) {
+                                console.log('Response status:', response.status);
+                                if (!response.ok) {
+                                    return response.text().then(text => {
+                                        throw new Error(`HTTP ${response.status}: ${text}`);
+                                    });
+                                }
+                                return response.json();
+                            })
+                            .then(function(data) {
+                                console.log('Share link generated:', data);
+                                loader.classList.add('d-none');
+                                result.classList.remove('d-none');
+                                input.value = data.url;
+
+                                // Auto-select the generated link for easy copying
+                                setTimeout(function() {
+                                    input.focus();
+                                    input.select();
+                                }, 100);
+                            })
+                            .catch(function(error) {
+                                console.error('Error generating share link:', error);
+                                loader.classList.add('d-none');
+                                result.classList.remove('d-none');
+                                input.value = 'Failed to generate link: ' + error.message;
+                            });
+                    };
+                    btn.addEventListener('click', btn._copyLinkHandler);
                 });
+            }
+
+            // Initial bind
+            document.addEventListener('DOMContentLoaded', function() {
+                bindCopyLinkButtons();
             });
+
+            // Re-bind after Livewire DOM update
+            document.addEventListener('livewire:load', function() {
+                bindCopyLinkButtons();
+            });
+
+            // For Livewire v3 compatibility
+            if (window.Livewire) {
+                window.Livewire.on('refresh', () => {
+                    setTimeout(bindCopyLinkButtons, 500);
+                });
+            }
 
             // ESC key to close preview modal
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    Livewire.dispatch('closePreview');
+                    window.Livewire.dispatch('closePreview');
                 }
             });
         </script>

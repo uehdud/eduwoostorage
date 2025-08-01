@@ -8,16 +8,35 @@ use App\Models\File;
 use App\Models\Folder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 
 class ShareLinkController extends Controller
 {
     // Generate a share link for file or folder
     public function generate(Request $request)
     {
+        Log::info('ShareLink generate request', [
+            'type' => $request->type,
+            'id' => $request->id,
+            'headers' => $request->headers->all()
+        ]);
+
         $request->validate([
             'type' => 'required|in:file,folder',
             'id' => 'required|integer',
         ]);
+
+        // Verify that the target exists
+        if ($request->type === 'file') {
+            $target = File::find($request->id);
+        } else {
+            $target = Folder::find($request->id);
+        }
+
+        if (!$target) {
+            Log::error('Target not found', ['type' => $request->type, 'id' => $request->id]);
+            return response()->json(['error' => 'Target not found'], 404);
+        }
 
         // Get referer to set appropriate allowed referer
         $referer = $request->headers->get('referer');
@@ -41,6 +60,13 @@ class ShareLinkController extends Controller
         ]);
 
         $url = URL::to('/share/' . $token);
+
+        Log::info('ShareLink generated successfully', [
+            'token' => $token,
+            'type' => $request->type,
+            'target_id' => $request->id,
+            'url' => $url
+        ]);
 
         return response()->json(['url' => $url]);
     }
